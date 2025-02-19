@@ -28,7 +28,7 @@ def send_time():
         print(f"Error sending message: {e}")
 
 # Schedule the job every 10 minutes
-schedule.every(10).minutes.do(send_time)
+schedule.every(2).minutes.do(send_time)
 
 if __name__ == "__main__":
     print("WhatsApp Bot is running...")
