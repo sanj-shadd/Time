@@ -1,36 +1,38 @@
-import asyncio
-from telegram import Bot
-from datetime import datetime
-import schedule
 import time
+import schedule
+from datetime import datetime
+from twilio.rest import Client
 
-# Telegram Bot Token and Chat ID
-BOT_TOKEN = "7634325376:AAHFqGzi6w5PnLqSd-pF_SCC1eXfuy-cjiA"
-CHAT_ID = "8027632810"
+# Twilio Credentials
+ACCOUNT_SID = "ACd3d11924833b8deda6cd627af1152a47"
+AUTH_TOKEN = "e5a3c0062b8c622f77a77e30f425e420"
+TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"  # Twilio Sandbox Number
+MY_WHATSAPP_NUMBER = "whatsapp:+254759596566"  # Your WhatsApp number
 
-bot = Bot(token=BOT_TOKEN)
+# Initialize Twilio Client
+client = Client(ACCOUNT_SID, AUTH_TOKEN)
 
-async def send_time():
-    """Sends the current time to the Telegram chat asynchronously."""
+def send_time():
+    """Sends the current time via WhatsApp"""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     message = f"Current Time: {now}"
     
     try:
-        await bot.send_message(chat_id=CHAT_ID, text=message)
+        client.messages.create(
+            from_=TWILIO_WHATSAPP_NUMBER,
+            to=MY_WHATSAPP_NUMBER,
+            body=message
+        )
         print(f"Sent: {message}")
     except Exception as e:
         print(f"Error sending message: {e}")
 
-def job():
-    asyncio.run(send_time())  # Ensures async execution
-
 # Schedule the job every 10 minutes
-schedule.every(10).minutes.do(job)
+schedule.every(10).minutes.do(send_time)
 
-# Run the scheduler
 if __name__ == "__main__":
-    print("Bot is running...")
-    asyncio.run(send_time())  # Send first message immediately
+    print("WhatsApp Bot is running...")
+    send_time()  # Send first message immediately
     while True:
         schedule.run_pending()
         time.sleep(60)  # Check every minute
